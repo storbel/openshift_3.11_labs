@@ -167,7 +167,7 @@ Kernel \r on an \m (\l)
 command
 
 ```
-pa aux
+ps aux
 ```
 [output]
 
@@ -471,25 +471,23 @@ A /opt
 docker **stop**
 
 ```
-docker stop e9f 1b7  
+docker stop e9f
 ```
 [output]
 
 ```
 e9f
-1b7
 ```
 
 docker **remove**
 
 ```
-docker rm e9f 1b7
+docker rm e9f
 ```
 [output]
 
 ```
 e9f
-1b7
 ```
 
 #### Publishing containers using port mapping
@@ -719,7 +717,7 @@ touch /opt/testfile
 docker stop dev
 docker start dev
 ```
-you can persist the data across. make the changes of dev environment as well , we wiiljust **stop** and **start** contaoner see the changes before start and stop.
+you can persist the data across. make the changes of dev environment as well , we will just **stop** and **start** container see the changes before start and stop.
 
 ```
 docker exec -it dev bash
@@ -771,240 +769,27 @@ docker ps
 
 ```
 CONTAINER ID        IMAGE                 COMMAND                  CREATED              STATUS              PORTS                    NAMES
-db7a8c18cdfc        portainer/portainer   "/portainer"             About a minute ago   Up About a minute   0.0.0.0:9000->9000/tcp   zen_jepsen
-99be0c7548ab        centos                "bash"                   32 minutes ago       Up 32 minutes                                dev-centos
-158dfe96692f        ubuntu                "bash"                   34 minutes ago       Up 34 minutes                                dev
-4c84890e1f44        ghost:alpine          "docker-entrypoint.s…"   About an hour ago    Up About an hour    0.0.0.0:3001->2368/tcp   ghost
-3104f3f3c062        nginx                 "nginx -g 'daemon of…"   About an hour ago    Up About an hour    0.0.0.0:8888->80/tcp     mystifying_golick
-6d631d2ecfdd        nginx                 "nginx -g 'daemon of…"   2 hours ago          Up 2 hours          0.0.0.0:32768->80/tcp    dreamy_gates
+CONTAINER ID        IMAGE                 COMMAND              CREATED             STATUS                    PORTS                    NAMES
+c00ed0edcc83        portainer/portainer   "/portainer"         3 seconds ago       Up 2 seconds              0.0.0.0:9000->9000/tcp   silly_stonebraker
+202d03ae4273        ratpnonroot           "httpd-foreground"   15 minutes ago      Up 15 minutes (healthy)   0.0.0.0:8000->80/tcp     interesting_colden
+28e9fcf6a7a3        ratp                  "httpd-foreground"   About an hour ago   Up About an hour          0.0.0.0:8080->80/tcp     ratp
 
 ```
 
-go to web browser use **host_ip:9000** or **loaclhost:9000**
-
-![portainer](images/portainer.png)
-
-here,we have create the password you it at least 8 char long
-
-![portainer](images/portainer1.png)
-
-here i have to use my local environment
-
-* click on as per your environment
-* click on connect
-
-![portainer](images/portainer3.png)
-
-above are the portainer page is already been setup. we dont worry abot how to launch this portainer set up this alredy avaible on docker images.
-
-* clik on local up
-
-![portainer](images/portainer4.png)
-
-here you can see how many container are present , network, volume etc
 
 
-#### Launching Application Stack with Docker Compose
-
-In this sections we are going to launch prometheus applications. the prometheus application are multiple serices present like pushgateawy and alertmanager that wy we need docker-compose file. just clone prometus repo.
-
-```
-git clone https://github.com/vegasbrianc/prometheus.git
-cd prometheus
-cat docker-compose.yaml
-```
-[output]
-
-```
-version: '3.1'
-
-volumes:
-    prometheus_data: {}
-    grafana_data: {}
-
-networks:
-  front-tier:
-  back-tier:
-
-services:
-
-  prometheus:
-    image: prom/prometheus:v2.1.0
-    volumes:
-      - ./prometheus/:/etc/prometheus/
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-      - '--web.console.templates=/usr/share/prometheus/consoles'
-    ports:
-      - 9090:9090
-    links:
-      - cadvisor:cadvisor
-      - alertmanager:alertmanager
-    depends_on:
-      - cadvisor
-    networks:
-      - back-tier
-    restart: always
-#    deploy:
-#      placement:
-#        constraints:
-#          - node.hostname == ${HOSTNAME}
-
-  node-exporter:
-    image: prom/node-exporter
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - --collector.filesystem.ignored-mount-points
-      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
-    ports:
-      - 9100:9100
-    networks:
-      - back-tier
-    restart: always
-    deploy:
-      mode: global
-
-  alertmanager:
-    image: prom/alertmanager
-    ports:
-      - 9093:9093
-    volumes:
-      - ./alertmanager/:/etc/alertmanager/
-    networks:
-      - back-tier
-    restart: always
-    command:
-      - '--config.file=/etc/alertmanager/config.yml'
-      - '--storage.path=/alertmanager'
-#    deploy:
-#      placement:
-#        constraints:
-#          - node.hostname == ${HOSTNAME}
-  cadvisor:
-    image: google/cadvisor
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    ports:
-      - 8080:8080
-    networks:
-      - back-tier
-    restart: always
-    deploy:
-      mode: global
-
-  grafana:
-    image: grafana/grafana
-    user: "104"
-    depends_on:
-      - prometheus
-    ports:
-      - 3000:3000
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning/:/etc/grafana/provisioning/
-    env_file:
-      - ./grafana/config.monitoring
-    networks:
-      - back-tier
-      - front-tier
-    restart: always
-
-```
-
-In this file you can see all the services are defined with portmapping. you can run the following command to run docker compose file
-
-```
-docker-compose up -d
-```
-also use stop and down . stop for stop the all created container and down for delete all create container.
-
-```
-docker-compose stop
-```
-
-```
-docker-compose down
-```
-#### Building an image manually with docker commit
-
-In this section we are going to see how to create image of application just excute following command
-
-```
-git clone https://github.com/schoolofdevops/facebooc.git
-
-```
-
-after cloning this repo we are going to launch ubuntu image this application running on port 1600 that why we are already exposing port.
-
-```
-docker container run -idt --name fb -p 16000:16000 ubuntu bash
-```
 connect to that container using following command
 
 ```
-docker exec -it fb bash
+docker exec -it myimg bash
 ```
-after connecting that container use following instructions.
+Do some modifications on the image, create new files, install software...etc
 
-Install following package:
-
-* build-essential
-* make
-* libsqlite3-dev
-* sqlite3
-
-```
-sudo apt-get update
-sudo apt-get install -yq build-essential make libsqlite3-dev sqlite3
-
-```
-
-after installing this packages we need source code cpoy your source code in insisde the container.
-
-```
-docker cp facebooc/ fb:/opt/
-```
- after copying the data go inside the container
-
-```
-docker exec -it fb bash
-```
-
-switch the dir.
-
-```
-cd /opt/facebooc/
-```
-
-then Build the application using following command
-
-```
-make all
-```  
-
-Run the application using binary
-
-```
-bin/facebooc
-```
-
-now go to the web browser **host_ip:16000** or **localhost:16000**
 
 then exit the container commit container using following command including your own tag with your docker hub id
 
 ```
-docker container commit fb initcron/fb:v1
+docker container commit myimg YOUR_GITHUB_ACCOUNT_NAME/myimg
 ```
 After creating image push to docker hub registry
 
@@ -1013,9 +798,9 @@ docker login
 ```
 
 ```
-docker image push initcron/fb:v1
+docker image push YOUR_GITHUB_ACCOUNT_NAME/myimg
 ```
-#### Automatiing image builds with a Dockerfile
+#### Automating image builds with a Dockerfile
 
 Above section we build the image using manual approach. In this we going to Dockerfile to build image automation. just clone the repo. using following command.
 
@@ -1069,7 +854,6 @@ docker run -dit --name ratp-app -p 8080:80 ratp
 from the UI of the click on the "OPEN PORT" then type 8080
 
 you will be redirected to the RATP website 
-
 
 After creating image push to docker hub registry
 
