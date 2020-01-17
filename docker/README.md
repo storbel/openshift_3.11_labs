@@ -1017,14 +1017,12 @@ docker image push initcron/fb:v1
 ```
 #### Automatiing image builds with a Dockerfile
 
-Above section we build the image using manual approch. In this we going to dockerfile to build image automation. just clone the repo. using following command.
+Above section we build the image using manual approach. In this we going to Dockerfile to build image automation. just clone the repo. using following command.
 
 ```
-git clone https://github.com/schoolofdevops/facebooc.git
-
-cd facebooc
-
 git checkout docker
+git clone https://github.com/storbel/ratp.git
+cd ratp
 
 ```
 
@@ -1036,32 +1034,51 @@ cat Dockerfile
 [output]
 
 ```
-FROM  ubuntu
-
-
-WORKDIR /opt/facebooc
-
-RUN  apt-get update &&  \
-     apt-get install -yq build-essential make git libsqlite3-dev sqlite3
-
-
-COPY . /opt/facebooc
-
-RUN  make all
-
-EXPOSE 16000
-
-CMD "bin/facebooc"
+FROM httpd:2.4
+COPY . /usr/local/apache2/htdocs/
 
 ```
 then build  docker image image
 
 ```
-docker image build -t initcron/fb:v2 .
+
+$ docker build -t ratp .
+Sending build context to Docker daemon  1.445MB
+Step 1/2 : FROM httpd:2.4
+2.4: Pulling from library/httpd
+8ec398bc0356: Already exists 
+354e6904d655: Pull complete 
+27298e4c749a: Pull complete 
+10e27104ba69: Pull complete 
+36412f6b2f6e: Pull complete 
+Digest: sha256:769018135ba22d3a7a2b91cb89b8de711562cdf51ad6621b2b9b13e95f3798de
+Status: Downloaded newer image for httpd:2.4
+ ---> c2aa7e16edd8
+Step 2/2 : COPY . /usr/local/apache2/htdocs/
+ ---> 047fd70bed37
+Successfully built 047fd70bed37
+Successfully tagged ratp:latest
 
 ```
 after build image launch it
 
 ```
-docker container run -idt -P initcron/fb:v2
+
+docker run -dit --name ratp-app -p 8080:80 ratp
 ```
+from the UI of the click on the "OPEN PORT" then type 8080
+
+you will be redirected to the RATP website 
+
+
+After creating image push to docker hub registry
+
+```
+docker login
+```
+
+```
+docker image push YOUR_GITHUB_USERNAME/ratp:latest
+```
+
+
