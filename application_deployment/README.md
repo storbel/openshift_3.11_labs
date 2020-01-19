@@ -51,4 +51,18 @@ $ oc new-app openshift/postgresql-92-centos7 \
     -e POSTGRESQL_PASSWORD=password
 ```
 
+
+#### To list all local templates and image streams, use:
+```
+  oc new-app -L
+ ```
+#### Search templates, image streams, and Docker images
+
+To search templates, image streams, and Docker images that match the arguments provided, use:
+```
+  oc new-app -S php
+  oc new-app -S --template=ruby
+  oc new-app -S --image-stream=mysql
+  oc new-app -S --docker-image=python
+  ```
  
