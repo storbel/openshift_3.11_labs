@@ -69,6 +69,7 @@ $ oc new-app https://github.com/storbel/devops-demo-app.git
     Run 'oc status' to view your app.
 ```
 
+
 ![project](images/frontend03.png)
 
  Then click create project. After create project automated build build your project .
@@ -166,7 +167,7 @@ describe route
 ```
 oc describe route front-end
 ```
-[ouutput]
+[output]
 ```
 Name:			front-end
 Namespace:		devops-demo-app
