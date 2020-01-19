@@ -1,9 +1,10 @@
 ## Deploying Devops Demo PHP Application for GitHub Repo
 
 In this section we are deploying sample devops demo PHP app from GitHub repo.
-we use the same cluster earlier deployed simple aaplication with **acs**  as  namespace/project.
+we use the same cluster earlier deployed simple application with **acs**  as  namespace/project.
 This docs demonstrates how to get a simple project up and running on OpenShift. Application that will serve a welcome page Welcome to the DevOps Demo Application.
 
+### Console
 Make sure you have selected **acs**. If not  switch  to it from web console.
 
 * click the Browse catalog you can see here multiple programming languages and databases.
@@ -37,6 +38,36 @@ In this section you can provides following options.
 * Resource Limit
 
 * Labels
+### Cli
+```
+$ oc new-app https://github.com/storbel/devops-demo-app.git
+--> Found image dc5aa55 (7 weeks old) in image stream "openshift/php" under tag "7.1" for "php"
+
+    Apache 2.4 with PHP 7.1
+    -----------------------
+    PHP 7.1 available as container is a base platform for building and running various PHP 7.1 applications and frameworks. PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers to write dynamically generated web pages. PHP also offers built-in database integration for several commercial and non-commercial database management systems, so writing a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding is probably as a replacement for CGI scripts.
+
+    Tags: builder, php, php71, rh-php71
+
+    * The source repository appears to match: php
+    * A source build using source code from https://github.com/storbel/devops-demo-app.git will be created
+      * The resulting image will be pushed to image stream tag "devops-demo-app:latest"
+      * Use 'start-build' to trigger a new build
+    * This image will be deployed in deployment config "devops-demo-app"
+    * Ports 8080/tcp, 8443/tcp will be load balanced by service "devops-demo-app"
+      * Other containers can access this service through the hostname "devops-demo-app"
+
+--> Creating resources ...
+    imagestream.image.openshift.io "devops-demo-app" created
+    buildconfig.build.openshift.io "devops-demo-app" created
+    deploymentconfig.apps.openshift.io "devops-demo-app" created
+    service "devops-demo-app" created
+--> Success
+    Build scheduled, use 'oc logs -f bc/devops-demo-app' to track its progress.
+    Application is not exposed. You can expose services to the outside world by executing one or more of the commands below:
+     'oc expose svc/devops-demo-app'
+    Run 'oc status' to view your app.
+```
 
 ![project](images/frontend03.png)
 
